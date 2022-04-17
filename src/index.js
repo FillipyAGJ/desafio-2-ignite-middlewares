@@ -27,14 +27,31 @@ function checksCreateTodosUserAvailability(request, response, next) {
   const { user } = request;
 
   if ((user.todos > 10) && (user.pro === false)) {
-    return response.status(403).json({ errror: 'unable to create a "to do" as it exceeded the limit of 10 created.' })
+    return response.status(403).json({ error: 'unable to create a "to do" as it exceeded the limit of 10 created.' })
   }
 
   return next();
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const user = users.find((user) => user.username === username);
+  const validateId = users.find((user) => user.id === user.validate);
+
+  if (!user) {
+    return response.status(404).json({ error: 'User not found' });
+  }
+
+  if (!validateId) {
+    return response.status(404).json({ error: 'Invalid id' });
+  }
+
+  request.user = user;
+  request.user = id;
+
+  return next();
 }
 
 function findUserById(request, response, next) {
