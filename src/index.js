@@ -26,11 +26,13 @@ function checksExistsUserAccount(request, response, next) {
 function checksCreateTodosUserAvailability(request, response, next) {
   const { user } = request;
 
-  if ((user.todos > 10) && (user.pro === false)) {
+  if ((user.todos.length >= 10) && (user.pro === false)) {
     return response.status(403).json({ error: 'unable to create a "to do" as it exceeded the limit of 10 created.' })
   }
 
-  return next();
+  if ((user.todos <= 10) || (user.pro === true)) {
+    return next();
+  }
 }
 
 function checksTodoExists(request, response, next) {
@@ -38,24 +40,37 @@ function checksTodoExists(request, response, next) {
   const { id } = request.params;
 
   const user = users.find((user) => user.username === username);
-  const validateId = users.find((user) => user.id === user.validate);
 
   if (!user) {
     return response.status(404).json({ error: 'User not found' });
   }
 
-  if (!validateId) {
-    return response.status(404).json({ error: 'Invalid id' });
+  if (!validate(id)) {
+    return response.status(400).json({ error: 'Todo id not a UUID!' })
+  }
+
+  const todo = user.todos.find(todo => todo.id = id);
+
+  if (!todo) {
+    return response.status(404).json({ error: 'Todo not found' });
   }
 
   request.user = user;
-  request.user = id;
+  request.todo = todo;
 
   return next();
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+  const { id } = request.params;
+
+  const user = users.find((user) => user.id === id);
+
+  if (!user) {
+    return response.status(404).json({ error: 'User not found' });
+  }
+
+  return next();
 }
 
 app.post('/users', (request, response) => {
