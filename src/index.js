@@ -49,7 +49,7 @@ function checksTodoExists(request, response, next) {
     return response.status(400).json({ error: 'Todo id not a UUID!' })
   }
 
-  const todo = user.todos.find(todo => todo.id = id);
+  const todo = user.todos.find(todo => todo.id === id);
 
   if (!todo) {
     return response.status(404).json({ error: 'Todo not found' });
@@ -69,6 +69,8 @@ function findUserById(request, response, next) {
   if (!user) {
     return response.status(404).json({ error: 'User not found' });
   }
+
+  request.user = user;
 
   return next();
 }
